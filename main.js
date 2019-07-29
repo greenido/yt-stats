@@ -6,10 +6,12 @@
 //
 // @see 
 // https://github.com/topics/puppeteer 
-// 
-// DB: http://www.sqlitetutorial.net/sqlite-limit/
+// http://expressjs.com/en/starter/static-files.html
 //
-
+// DB: 
+// http://www.sqlitetutorial.net/sqlite-limit/
+// https://www.npmjs.com/package/sqlite3
+//
 const puppeteer = require("puppeteer");
 var fs = require('fs');
 var sqlite3 = require('sqlite3').verbose();
@@ -20,7 +22,6 @@ var bodyParser = require('body-parser');
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
 
 // init sqlite db
@@ -37,11 +38,15 @@ db.serialize(function(){
   }
   else {
     console.log('🏈 Database "stats" ready to go!');
-    db.each('SELECT * from stats limit 10', function(err, row) {
+    db.each('SELECT * from Stats ORDER BY total DESC limit 10;', function(err, row) {
       if ( row ) {
-        console.log('*** Record:', row);
+        console.log('🏝 Record:', row);
       }
     });
+    
+    //
+    // Start it 🚦
+    //
     run();
   }
 });
@@ -53,10 +58,10 @@ app.get('/', function(request, response) {
   response.sendFile(__dirname + '/views/index.html');
 });
 
-/////////////////////////////////////////////////
-// endpoint to get all the dreams in the database
-// currently this is the only endpoint, ie. adding dreams won't update the database
+//
+// endpoint to get all the stats in the database
 // read the sqlite3 module docs and try to add your own! https://www.npmjs.com/package/sqlite3
+//
 app.get('/getStats', function(request, response) {
   db.all('SELECT * from Stats ORDER BY id DESC limit 10;', function(err, rows) {
     response.send(JSON.stringify(rows));
@@ -144,8 +149,12 @@ async function run() {
       console.log("^^ elm " + element + " \n\n");
       return element ? element.innerHTML : null;
     }, VIEWS_SELECTOR);
-
+  
+    await page.focus(VIEWS_SELECTOR);
+    await page.keyboard.type('k'); // let's play it for 5sec.
+    await page.waitFor(5000); 
     views = parseInt(views);
+    
     console.log("The views for " +key + " video are: " + views);
     var ts = Math.round((new Date()).getTime() ); 
     var now = new Date().toISOString();
@@ -156,15 +165,13 @@ async function run() {
       }
       console.log("Updated the DB for "+ key);
     });
-  
     return views;
   }
 }
 
 //
-// start the party
+// start the party - listen for requests 🕌
 // 
-// listen for requests :)
 var listener = app.listen(process.env.PORT, function() {
   console.log('⛰ Your app is listening on port ' + listener.address().port);
 });
