@@ -1,0 +1,26 @@
+{
+  "name": "YT-stats",
+  "version": "0.1.1",
+  "description": "A node app to get stats from YT with puppeteer ⛰",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "dependencies": {
+    "puppeteer": "^1.19.0",
+    "express": "^4.16.3",
+    "sqlite3": "^4.0.9"
+  },
+  "engines": {
+    "node": "12.x"
+  },
+  "repository": {
+    "url": "todo"
+  },
+  "license": "MIT",
+  "keywords": [
+    "node",
+    "youtube",
+    "express"
+  ]
+}
